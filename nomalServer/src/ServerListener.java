@@ -2,7 +2,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class serverListener extends Thread {
+public class ServerListener extends Thread{
+
     @Override
     public void run() {
         try {
@@ -11,6 +12,7 @@ public class serverListener extends Thread {
             while (true){
                 Socket socket = serverSocket.accept();
 
+                //JOptionPane.showMessageDialog(null,"new util.client connect");
                 chatSocket cs = new chatSocket(socket);
                 System.out.println("new socket connect: " + cs.socket.getInetAddress());
                 cs.start();
@@ -20,4 +22,5 @@ public class serverListener extends Thread {
             e.printStackTrace();
         }
     }
+
 }

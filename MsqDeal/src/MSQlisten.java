@@ -15,16 +15,17 @@ public class MSQlisten {
         while (true) {
             Socket clientSocket = serverSocket.accept();
             client.add(clientSocket);
-            new Thread(new upload(clientSocket,client)).start();
+            System.out.println(clientSocket.getInetAddress() + " connected");
+            new Thread(new upload(clientSocket, client)).start();
         }
     }
 
-    private static class upload implements Runnable{
+    private static class upload implements Runnable {
 
         private Socket clientSocket;
         List<Socket> client_list;
 
-        public upload(Socket socket, List<Socket> client_list){
+        public upload(Socket socket, List<Socket> client_list) {
             this.clientSocket = socket;
             this.client_list = client_list;
         }
@@ -40,27 +41,29 @@ public class MSQlisten {
                     int length = is.read(data);
                     String rec = new String(data, 0, length);
 
-                    if (rec.equals("0")){
+                    if (rec.equals("0")) {
                         historyWrite.historyWrite("有毒气体");
-                    }else if (rec.equals("1")){
+                    } else if (rec.equals("1")) {
                         historyWrite.historyWrite("非法入侵");
-                    }else if (rec.equals("100")){
+                    } else if (rec.equals("100")) {
                         ResultSet inread = historyRead.read(clientSocket);
                         OutputStream os = clientSocket.getOutputStream();
                         String sendrec = "";
-                        while (inread.next()){
-                            sendrec = sendrec + "|" + inread.getString("times").substring(11,16) + "      "+inread.getString("msg");
+                        while (inread.next()) {
+                            sendrec = sendrec + "|" + inread.getString("times").substring(11, 16) + "      " + inread.getString("msg");
                         }
                         System.out.println(sendrec);
                         os.write(sendrec.getBytes());
-                    }else {
+                    } else if (rec.equals("200")) {
+                        imgSend.imgSend();
+                    } else {
                         OutputStream os = clientSocket.getOutputStream();
                         os.write("wrong data".getBytes());
                         os.flush();
                     }
 
                 }
-            }catch (Exception ex){
+            } catch (Exception ex) {
 
             }
         }
